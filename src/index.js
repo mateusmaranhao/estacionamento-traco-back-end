@@ -31,8 +31,40 @@ app.post('/api/vehicles', async (request, response) => {
   });
 });
 
-app.put('/api/vehicles/:id', (request, response) => {
-  
+app.put('/api/vehicles/:id', async (request, response) => {
+  const { model, label, type, owner, observation } = request.body;
+  const { id } = request.params;
+
+  const db = await openDatabase();
+
+  const vehicle = await db.get(`
+    SELECT * FROM vehicles WHERE id = ?
+  `, [id]);
+
+  if(vehicle) {
+    const data = await db.get(`
+    UPDATE vehicles
+      SET model = ?,
+          label = ?, 
+          type = ?, 
+          owner = ?, 
+          observation = ?
+      WHERE id = ?
+
+    `, [model, label, type, owner, observation, id]);
+    db.close();
+    response.send({
+      id,
+      model, 
+      label, 
+      type, 
+      owner,
+      observation
+    });
+  }
+
+  db.close();
+  response.send(vehicle || {});
 });
 
 app.delete('/api/vehicles/:id', (request, response) => {
