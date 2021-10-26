@@ -9,7 +9,7 @@ app.get('/api/vehicles', (request, response) =>{
     {
       id: '1',
       name: '328i e36',
-      owner: 'Mateus',
+      owner: 'Mateus César',
       type: 'car',
     },
     {
@@ -26,6 +26,18 @@ app.get('/api/vehicles', (request, response) =>{
   response.send(vehicles)
 });
 
+app.post('/api/vehicles', (request, response) => {
+
+});
+
+app.put('/api/vehicles/:id', (request, response) => {
+  
+});
+
+app.delete('/api/vehicles/:id', (request, response) => {
+  
+});
+
 app.listen(8000, () => {
-  console.log("Olá, mundo. Está é minha primeira API!")
+  console.log("Servidor rodando na porta 8000")
 })
