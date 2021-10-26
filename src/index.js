@@ -24,7 +24,7 @@ app.post('/api/vehicles', async (request, response) => {
   response.send({
     id: data.lastID,
     model, 
-    label, 
+    label,
     type, 
     owner,
     observation
@@ -67,8 +67,18 @@ app.put('/api/vehicles/:id', async (request, response) => {
   response.send(vehicle || {});
 });
 
-app.delete('/api/vehicles/:id', (request, response) => {
-  
+app.delete('/api/vehicles/:id', async (request, response) => {
+  const { id } = request.params;
+  const db = await openDatabase();
+  const data = await db.run(`
+    DELETE FROM vehicles
+      WHERE id = ? 
+  `, [id]);
+  db.close();
+  response.send({
+    id,
+    message: `Veículo [${id}] removido com sucesso.`
+  });
 });
 
 app.listen(8000, () => {
