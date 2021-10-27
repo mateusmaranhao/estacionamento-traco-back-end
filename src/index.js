@@ -81,6 +81,24 @@ app.delete('/api/vehicles/:id', async (request, response) => {
   });
 });
 
+// Endpoints Activities
+
+app.post('/api/activities/checkin', async (request, response) => {
+
+});
+
+app.put('/api/activities/checkout', async (request, response) => {
+
+});
+
+app.delete('/api/activities/:id', async (request, response) => {
+
+});
+
+app.get('/api/activities', async (request, response) => {
+
+});
+
 app.listen(8000, () => {
   console.log("Servidor rodando na porta 8000")
 })
