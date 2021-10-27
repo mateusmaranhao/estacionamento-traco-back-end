@@ -108,12 +108,55 @@ app.post('/api/activities/checkin', async (request, response) => {
   }
   db.close();
   response.send({
-    message: `O veículo com a placa [${label}] não está cadastrada`
+    message: `O veículo com a placa [${label}] não está cadastrado`
   })
 });
 
 app.put('/api/activities/checkout', async (request, response) => {
+  const { label, price } = request.body;
+  const db = await openDatabase();
 
+  const vehicle = await db.get(`
+    SELECT * FROM vehicles WHERE label = ? 
+  `, [label]);
+
+  if(vehicle) {
+    const activityOpen = await db.get(`
+    SELECT * 
+      FROM activities 
+    WHERE vehicles_id = ? 
+      AND checkout_at is NULL 
+  `, [vehicle.id]);
+
+    if(activityOpen) {
+      const checkoutAt = (new Date()).getTime();
+      const data = await db.run(`
+        UPDATE activities
+          SET checkout_at = ?,
+              price = ?
+        WHERE id = ?
+      `, [checkoutAt, price, activityOpen.id]);
+
+      db.close();
+      response.send({
+        vehicles_id: vehicle.id,
+        checkout_at: checkoutAt, 
+        price: price,
+        message: `O veículo com a placa [${vehicle.label}] saiu do estacionamento`
+      });
+      return;
+    }
+
+    db.close();
+    response.send({
+      message: `O veículo com a placa [${label}] não realizou nenhum check-in`
+    })
+    return;
+  }
+  db.close();
+  response.send({
+    message: `O veículo com a placa [${label}] não está cadastrado`
+  })
 });
 
 app.delete('/api/activities/:id', async (request, response) => {
