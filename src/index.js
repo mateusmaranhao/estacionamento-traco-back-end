@@ -160,11 +160,26 @@ app.put('/api/activities/checkout', async (request, response) => {
 });
 
 app.delete('/api/activities/:id', async (request, response) => {
-
+  const { id } = request.params;
+  const db = await openDatabase();
+  const data = await db.run(`
+    DELETE FROM activities
+      WHERE id = ? 
+  `, [id]);
+  db.close();
+  response.send({
+    id,
+    message: `Atividade [${id}] removida com sucesso.`
+  });
 });
 
 app.get('/api/activities', async (request, response) => {
-
+  const db = await openDatabase();
+  const activities = await db.all(`
+    SELECT * FROM activities
+  `);
+  db.close();
+  response.send(activities);
 });
 
 app.listen(8000, () => {
