@@ -84,7 +84,32 @@ app.delete('/api/vehicles/:id', async (request, response) => {
 // Endpoints Activities
 
 app.post('/api/activities/checkin', async (request, response) => {
+  const { label } = request.body;
+  const db = await openDatabase();
 
+  const vehicle = await db.get(`
+    SELECT * FROM vehicles WHERE label = ? 
+  `, [label]);
+
+  if(vehicle) {
+    const checkinAt = (new Date()).getTime();
+    const data = await db.run(`
+    INSERT INTO activities (vehicles_id, checkin_at) 
+    VALUES (?, ?)
+  `, [vehicle.id, checkinAt]);
+
+  db.close();
+  response.send({
+    vehicles_id: vehicle.id,
+    checkin_at: checkinAt, 
+    message: `O veículo com a placa [${vehicle.label}] entrou no estacionamento`
+  });
+  return;
+  }
+  db.close();
+  response.send({
+    message: `O veículo com a placa [${label}] não está cadastrada`
+  })
 });
 
 app.put('/api/activities/checkout', async (request, response) => {
